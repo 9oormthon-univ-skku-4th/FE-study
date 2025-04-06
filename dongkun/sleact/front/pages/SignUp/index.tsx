@@ -13,18 +13,27 @@ const SignUp = () => {
     const onChangeEmail = useCallback((e)=>{
         setEmail(e.target.value);
     }, [])
+
     const onChangeNickname = useCallback((e)=>{
         setNickname(e.target.value);
     }, [])
+
     const onChangePassword = useCallback((e)=>{
         setPassword(e.target.value);
-    }, [])
+        setMismatchError(e.target.value !== passwordCheck);
+    }, [passwordCheck])
+
     const onChangePasswordCheck = useCallback((e)=>{
         setPasswordCheck(e.target.value);
-    }, [])
+        setMismatchError(e.target.value !== password);
+    }, [password])
+
     const onSubmit = useCallback((e)=>{
         e.preventDefault();
         console.log(email, nickname, password, passwordCheck);
+        if(!mismatchError){
+          console.log('Submitted')
+        }
     }, [email, nickname, password, passwordCheck])
 
     return (
