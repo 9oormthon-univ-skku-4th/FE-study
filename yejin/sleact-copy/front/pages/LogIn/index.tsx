@@ -1,13 +1,7 @@
-import useInput from '@hooks/useInput';
-import { Button, Error, Form, Header, Input, Label, LinkContainer } from '@pages/SignUp/styles';
-import fetcher from '@utils/fetcher';
-import axios from 'axios';
-import React, { useCallback, useState } from 'react';
-import { Redirect } from 'react-router-dom';
-import useSWR from 'swr';
 
 const LogIn = () => {
-  const { data: userData, error, mutate } = useSWR('/api/users', fetcher);
+  const { data, error, revalidate, mutate } = useSWR('/api/users', fetcher);
+
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -23,22 +17,29 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then(() => {
-          mutate();
+        .then((response) => {
+          revalidate();
         })
         .catch((error) => {
-          console.dir(error);
           setLogInError(error.response?.status === 401);
         });
     },
-    [email, password, mutate],
+    [email, password],
   );
 
-  console.log(error, userData);
-  if (!error && userData) {
-    console.log('로그인됨', userData);
+  if (data === undefined) {
+    return <div>로딩중...</div>;
+  }
+
+  if (data) {
     return <Redirect to="/workspace/sleact/channel/일반" />;
   }
+
+  // console.log(error, userData);
+  // if (!error && userData) {
+  //   console.log('로그인됨', userData);
+  //   return <Redirect to="/workspace/sleact/channel/일반" />;
+  // }
 
   return (
     <div id="container">
@@ -61,7 +62,7 @@ const LogIn = () => {
       </Form>
       <LinkContainer>
         아직 회원이 아니신가요?&nbsp;
-        <a href="/signup">회원가입 하러가기</a>
+        <Link to="/signup">회원가입 하러가기</Link>
       </LinkContainer>
     </div>
   );
