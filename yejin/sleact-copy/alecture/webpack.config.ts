@@ -4,11 +4,11 @@ import webpack, { Configuration as WebpackConfiguration } from "webpack";
 import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
 }
-
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -49,7 +49,10 @@ const config: Configuration = {
           ],
           env: {
             development: {
-              plugins: [require.resolve('react-refresh/babel')],
+              plugins: [['@emotion', {sourceMap: true}], require.resolve('react-refresh/babel')],
+            },
+            production:{
+              plugins: ['@emotion'],
             },
           },
         },
@@ -80,12 +83,13 @@ const config: Configuration = {
     port: 3090,
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
-    proxy: {
-      '/api/': {
+    proxy: [
+      {
+        context: ['/api'],
         target: 'http://localhost:3095',
         changeOrigin: true,
       },
-    },
+    ],
   },
 };
 

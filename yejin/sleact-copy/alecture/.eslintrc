@@ -1,3 +1,9 @@
 {
-  "extends": ["plugin:prettier/recommended", "react-app"]
+  "extends": [
+    "plugin:prettier/recommended",
+    "react-app"
+  ],
+  "rules": {
+    "prettier/prettier": "warn" // 또는 "off"
+  }
 }
