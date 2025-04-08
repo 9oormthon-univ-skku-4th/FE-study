@@ -3,51 +3,59 @@ import { Button, Error, Form, Header, Input, Label, LinkContainer, Success } fro
 import useInput from '@hooks/useInput';
 import axios from 'axios';
 
-
 const SignUp = () => {
-    const [email, onChangeEmail, setEmail] = useInput('')
-    const [nickname, onChangeNickname, setNickname] = useInput('')
-    const [password, setPassword] = useState('')
-    const [passwordCheck, setPasswordCheck] = useState('')
-    const [mismatchError, setMismatchError] = useState(false)
-    const [signUpError, setSignUpError] = useState('')
-    const [signUpSuccess, setSignUpSuccess] = useState(false)
+  const [email, onChangeEmail, setEmail] = useInput('');
+  const [nickname, onChangeNickname, setNickname] = useInput('');
+  const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
+  const [mismatchError, setMismatchError] = useState(false);
+  const [signUpError, setSignUpError] = useState('');
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-    const onChangePassword = useCallback((e)=>{
-        setPassword(e.target.value);
-        setMismatchError(e.target.value !== passwordCheck);
-    }, [passwordCheck])
+  const onChangePassword = useCallback(
+    (e) => {
+      setPassword(e.target.value);
+      setMismatchError(e.target.value !== passwordCheck);
+    },
+    [passwordCheck],
+  );
 
-    const onChangePasswordCheck = useCallback((e)=>{
-        setPasswordCheck(e.target.value);
-        setMismatchError(e.target.value !== password);
-    }, [password])
+  const onChangePasswordCheck = useCallback(
+    (e) => {
+      setPasswordCheck(e.target.value);
+      setMismatchError(e.target.value !== password);
+    },
+    [password],
+  );
 
-    const onSubmit = useCallback((e)=>{
-        e.preventDefault();
-        if(!mismatchError && nickname){
-          setSignUpError('');
-          setSignUpSuccess(false);
-          axios
-            .post('http://localhost:3095/api/users', {
-              email,
-              nickname,
-              password,
-            })
-            .then((response) => {
-              console.log(response);
-              setSignUpSuccess(true);
-            })
-            .catch((error) => {
-              console.log(error.response);
-              setSignUpError(error.response.data);
-            })
-            .finally(() => {});
-        }
-    }, [email, nickname, password, passwordCheck])
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!mismatchError && nickname) {
+        setSignUpError('');
+        setSignUpSuccess(false);
+        axios
+          .post('http://localhost:3095/api/users', {
+            email,
+            nickname,
+            password,
+          })
+          .then((response) => {
+            console.log(response);
+            setSignUpSuccess(true);
+          })
+          .catch((error) => {
+            console.log(error.response);
+            setSignUpError(error.response.data);
+          })
+          .finally(() => {});
+      }
+    },
+    [email, nickname, password, passwordCheck],
+  );
 
-    return (
-        <div id="container">
+  return (
+    <div id="container">
       <Header>Sleact</Header>
       <Form onSubmit={onSubmit}>
         <Label id="email-label">
@@ -91,7 +99,7 @@ const SignUp = () => {
         <a href="/login">로그인 하러가기</a>
       </LinkContainer>
     </div>
-      );
-}
+  );
+};
 
 export default SignUp;
