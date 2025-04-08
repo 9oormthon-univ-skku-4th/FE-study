@@ -7,11 +7,11 @@ import { Redirect } from 'react-router-dom';
 import useSWR from 'swr';
 
 const LogIn = () => {
-  const {data, error} = useSWR('http://localhost:3095/api/users', fetcher);
+  const {data, error, mutate} = useSWR('http://localhost:3095/api/users', fetcher); // 로그인 페이지 들어오면 처음에 실행됨, data는 false
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
-  const onSubmit = useCallback(
+  const onSubmit = useCallback( // 로그인 버튼 누르면 실행됨 
     (e) => {
       e.preventDefault();
       setLogInError(false);
@@ -24,6 +24,8 @@ const LogIn = () => {
           },
         )
         .then(() => {
+          mutate(); // 성공 시 mutate 함수 호출 (구 revalidate)
+          // data, error가 바뀌는 순간 컴포넌트는 리렌더링됨 
         })
         .catch((error) => {
           console.dir(error);
@@ -33,6 +35,14 @@ const LogIn = () => {
     [email, password],
   );
 
+  // 로딩 중 
+  if (data === undefined){
+    return <div>로딩 중...</div>
+  }
+
+  if(data){ // 로그인 성공 후에 채널로 가게 됨, data에 내 정보 들어있음  
+    return <Redirect to="/workspace/channel"/>
+  }
   // console.log(error, userData);
   // if (!error && userData) {
   //   console.log('로그인됨', userData);
