@@ -1,33 +1,34 @@
 import React, { useCallback, useState } from "react";
 import { Form, Error,  Label, Input, LinkContainer, Button, Header } from './styles';
+import useInput from "@hooks/useinput";
 
 const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordCheck, setPasswordCheck] = useState('');
+  const [email, onChangeEmail] = useInput('');
+  const [nickname, onChangeNickname] = useInput('');
+
+  const [password, , setPassword] = useInput(''); // 커스터마이징도 가능 
+  const [passwordCheck, , setPasswordCheck] = useInput('');
 
   const [mismatchError, setMismatchError] = useState(false);
-  const onChangeEmail = useCallback((e) => {
-    setEmail(e.target.value);
-  }, []);
-  const onChangeNickname = useCallback((e) => {
-    setNickname(e.target.value);
-  }, []);
+
   const onChangePassword = useCallback((e) => {
     setPassword(e.target.value);
     setMismatchError(e.target.value !== passwordCheck);
   }, [passwordCheck]);
+
   const onChangePasswordCheck = useCallback((e) => {
     setPasswordCheck(e.target.value);
     setMismatchError(e.target.value !== password);
   }, [password]);
+
   const onSubmit = useCallback((e) => { // useCallback이 있어야 값 기억, 바뀔 때 함수 재생성 할 수 있음 
     e.preventDefault();
     console.log(email, nickname, password, passwordCheck);
+
     if(!mismatchError){
       console.log('서버로 회원가입하기')
     }
+
   }, [email, nickname, password, passwordCheck, mismatchError]);
 
   return (
