@@ -1,13 +1,29 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Error, Form, Header, Input, Label, LinkContainer } from '@pages/LogIn/styles';
+import { Button, Error, Form, Header, Input, Label, LinkContainer } from '@pages/SignUp/styles';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import useInput from '@hooks/useInput';
 
 const LogIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, onChangeEmail] = useInput('');
+  const [password, onChangePassword] = useInput('');
   const [logInError, setLogInError] = useState(false);
-  const onChangeEmail = useCallback(() => {}, []);
-  const onChangePassword = useCallback(() => {}, []);
-  const onSubmit = useCallback(() => {}, []);
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      setLogInError(false);
+      axios
+        .post('http://localhost:3095/api/users/login', {
+          email,
+          password,
+        })
+        .then(() => {})
+        .catch((error) => {
+          setLogInError(error.response?.data?.statusCode === 401);
+        });
+    },
+    [email, password],
+  );
 
   return (
     <div id="container">
@@ -30,7 +46,7 @@ const LogIn = () => {
       </Form>
       <LinkContainer>
         아직 회원이 아니신가요?&nbsp;
-        <a href="/signup">회원가입 하러가기</a>
+        <Link to="/signup">회원가입 하러가기</Link>
       </LinkContainer>
     </div>
   );
