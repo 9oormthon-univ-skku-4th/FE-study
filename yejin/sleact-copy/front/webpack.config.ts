@@ -82,6 +82,12 @@ const config: Configuration = {
     port: 3090,
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
+    proxy: {
+      '/api/': { // 3095가 보낸 것처럼 취급하겠다 (다른 도메인이지만 같은 도메인인 것처럼 속임)
+        target: 'http://localhost:3095', // 둘 다 로컬호스트일 때만 사용 가능 
+        changeOrigin: true,
+      },
+    },
   },
 };
 
