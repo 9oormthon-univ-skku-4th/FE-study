@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
-import useInput from "@hooks/useinput";
+import { Link } from 'react-router-dom';
+import useInput from "@hooks/useInput";
 import axios from "axios";
 
 const SignUp = () => {
@@ -94,8 +95,7 @@ const SignUp = () => {
       </Form>
       <LinkContainer>
         이미 회원이신가요?&nbsp;
-        <a href="./login">로그인 하러가기</a>
-        {/* <Link to="/login">로그인 하러가기</Link> */}
+        <Link to="/login">로그인 하러가기</Link>
       </LinkContainer>
     </div>
   );
