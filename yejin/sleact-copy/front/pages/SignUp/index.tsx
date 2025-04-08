@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Form, Error,  Label, Input, LinkContainer, Button, Header } from './styles';
 import useInput from "@hooks/useinput";
+import axios from "axios";
 
 const SignUp = () => {
   const [email, onChangeEmail] = useInput('');
@@ -27,6 +28,19 @@ const SignUp = () => {
 
     if(!mismatchError){
       console.log('서버로 회원가입하기')
+      axios.post('http://localhost:3095/api/users', { // 포트 번호 유의 (3090이 3095'로' 보내는 것)
+        email, 
+        nickname, 
+        password, 
+      }) // 요청을 어디로? -> 백엔드 API리스트 참고 (모든 주소들 앞에는 API 생략되어있는거임)
+        // Promise
+        .then((response) => {
+          console.log(response);
+        }) // 성공 
+        .catch((error) => {
+          console.log(error.response);
+        }) // 실패 error는 axios에 담겨 있음 
+        .finally(() => {}); // 항상 
     }
 
   }, [email, nickname, password, passwordCheck, mismatchError]);
