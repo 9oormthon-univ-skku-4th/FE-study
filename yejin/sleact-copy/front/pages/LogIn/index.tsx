@@ -23,8 +23,8 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then(() => {
-          mutate(); // 성공 시 mutate 함수 호출 (구 revalidate)
+        .then((response) => {
+          mutate(response.data, false); 
           // data, error가 바뀌는 순간 컴포넌트는 리렌더링됨 
         })
         .catch((error) => {
