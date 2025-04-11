@@ -63,7 +63,7 @@ const SignUp = () => {
     // 위치 아무데나 둘 수 있는 거 아님!!
     // 항상 여기 있어야 함 (return은 항상 hooks보다 아래 있어야 함)
     if(data){
-      return <Redirect to="/workspace/channel"/>
+      return <Redirect to="/workspace/sleact/channel/일반"/>
     }
 
   return (

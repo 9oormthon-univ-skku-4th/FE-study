@@ -1,14 +1,14 @@
 import fetcher from "@utils/fetcher";
 import axios from "axios";
 import React, { FC, useCallback, useState, VFC } from "react";
-import { Redirect, Route, Switch } from "react-router";
+import { Redirect, Route, Switch, useParams } from "react-router";
 import useSWR from "swr";
 import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceModal, WorkspaceName, Workspaces, WorkspaceWrapper } from "./styles";
 import gravatar from 'gravatar';
 import loadable from "@loadable/component";
 import Menu from "@components/Menu";
 import { Link } from "react-router-dom";
-import { IUser } from "@typings/db";
+import { IChannel, IUser } from "@typings/db";
 import useInput from "@hooks/useInput";
 import Modal from "@components/Modal";
 import { Button, Input, Label } from "@pages/SignUp/styles";
@@ -23,13 +23,22 @@ const Workspace: VFC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateworkspaceModal, setShowCreateworkspaceModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
-  const [showCreateChannelModal, setShowCreateChannelModal]  = useState(false);
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
-  const { data: userData, error, mutate } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher);
+  const {workspace} = useParams<{workspace: string}>(); 
+  const { data: userData, error, mutate } = useSWR<IUser | false>(
+    'http://localhost:3095/api/users',
+    fetcher,
+    { dedupingInterval: 2000, }
+  );
+  // 서버로부터 채널 데이터 받아오기 (현재 내 워크스페이스에 있는 채널들 모두 가져옴) 
+  // 로그인하지 않은 상태(userData가 null이면 -> null가져옴)
+  const { data: channelData } = useSWR<IChannel[]>(userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null, fetcher);
 
-  const onLogOut = useCallback(() => {
+
+  const onLogout = useCallback(() => {
     axios.post('http://localhost:3095/api/users/logout', null, {
       withCredentials: true,
     })
@@ -83,8 +92,8 @@ const Workspace: VFC = () => {
     setShowWorkspaceModal((prev) => !prev);
   }, []);
 
-  const onClickAddChannel = useCallback(()=> {
-    setShowCreateChannelModal(true); 
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal(true);
   }, [])
 
 
@@ -106,12 +115,12 @@ const Workspace: VFC = () => {
                   <span id="profile-active">Active</span>
                 </div>
               </ProfileModal>
-              <LogOutButton onClick={onLogOut}>로그아웃</LogOutButton>
+              <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
             </Menu>}
           </span>
         </RightMenu>
       </Header>
-      <button onClick={onLogOut}>로그아웃</button>
+      <button onClick={onLogout}>로그아웃</button>
       <WorkspaceWrapper>
         <Workspaces>{userData?.Workspaces.map((ws) => {
           return (
@@ -132,15 +141,18 @@ const Workspace: VFC = () => {
                 <h2>Sleact</h2>
                 { }
                 <button onClick={onClickAddChannel}>채널 만들기</button>
-                <button onClick={onLogOut}>로그아웃</button>
+                <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
+            {channelData?.map((v)=> (<div>
+              {v.name}
+            </div>))} {/* 없을 수도 있으면 물음표 */}
           </MenuScroll>
         </Channels>
         <Chats>
           <Switch>
-            <Route path="/workspace/channel" component={Channel} />
-            <Route path="/workspace/dm" component={DirectMessage} />
+            <Route path="/workspace/:workspace/channel/:channel" component={Channel} />
+            <Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />
           </Switch>
         </Chats>
       </WorkspaceWrapper>
@@ -157,7 +169,10 @@ const Workspace: VFC = () => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
-      <CreateChannelModal show = {showCreateChannelModal} onCloseModal={onCloseModal}/>
+      <CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={onCloseModal}
+        setShowCreateChannelModal={setShowCreateChannelModal} />
     </div>
   )
 }
