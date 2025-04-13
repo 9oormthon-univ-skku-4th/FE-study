@@ -204,3 +204,26 @@ export const WorkspaceButton = styled.button`
   color: black;
   cursor: pointer;
 `;
+
+
+export const CaretIcon = styled.span<{ collapsed: boolean }>`
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: ${({ collapsed }) => (collapsed ? 'rotate(-45deg)' : 'rotate(45deg)' )};
+  transition: transform 0.2s ease-in-out;
+  margin-right: 6px;
+`;
+
+export const PresenceDot = styled.span<{ isOnline: boolean }>`
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1; 
+  background-color: ${({ isOnline }) => (isOnline ? '#2BAC76' : '#ccc')}; // 초록 or 회색
+  margin-right: 8px;
+  vertical-align: middle;
+`;

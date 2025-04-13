@@ -1,5 +1,6 @@
 import { CollapseButton } from '@components/DMList/styles';
 import EachChannel from '@components/EachChannel';
+import { CaretIcon } from '@layouts/Workspace/styles';
 import { IChannel, IUser } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import React, { FC, useCallback, useState } from 'react';
@@ -27,11 +28,12 @@ const ChannelList: FC<Props> = () => {
     <>
       <h2>
         <CollapseButton collapse={channelCollapse} onClick={toggleChannelCollapse}>
-          <i
+          {/* <i
             className="c-icon p-channel_sidebar__section_heading_expand p-channel_sidebar__section_heading_expand--show_more_feature c-icon--caret-right c-icon--inherit c-icon--inline"
             data-qa="channel-section-collapse"
             aria-hidden="true"
-          />
+          /> */}
+          <CaretIcon collapsed={channelCollapse} />
         </CollapseButton>
         <span>Channels</span>
       </h2>

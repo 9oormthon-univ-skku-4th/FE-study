@@ -1,3 +1,4 @@
+import { PresenceDot } from '@layouts/Workspace/styles';
 import { IUser } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import React, { useEffect, VFC } from 'react';
@@ -29,7 +30,7 @@ const EachDM: VFC<Props> = ({ member, isOnline }) => {
 
   return (
     <NavLink key={member.id} activeClassName="selected" to={`/workspace/${workspace}/dm/${member.id}`}>
-      <i
+      {/* <i
         className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${
           isOnline ? 'c-presence--active c-icon--presence-online' : 'c-icon--presence-offline'
         }`}
@@ -38,7 +39,8 @@ const EachDM: VFC<Props> = ({ member, isOnline }) => {
         data-qa-presence-self="false"
         data-qa-presence-active="false"
         data-qa-presence-dnd="false"
-      />
+      /> */}
+      <PresenceDot isOnline={isOnline} />
       <span className={count && count > 0 ? 'bold' : undefined}>{member.nickname}</span>
       {member.id === userData?.id && <span> (나)</span>}
       {(count && count > 0 && <span className="count">{count}</span>) || null}

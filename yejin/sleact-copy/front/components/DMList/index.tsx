@@ -8,6 +8,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
+import { CaretIcon } from '@layouts/Workspace/styles';
 
 const DMList = () => {
   const { workspace } = useParams<{ workspace?: string }>(); // 라우터 파라미터 
@@ -46,11 +47,12 @@ const DMList = () => {
     <>
       <h2>
         <CollapseButton collapse={channelCollapse} onClick={toggleChannelCollapse}>
-          <i
+          {/* <i
             className="c-icon p-channel_sidebar__section_heading_expand p-channel_sidebar__section_heading_expand--show_more_feature c-icon--caret-right c-icon--inherit c-icon--inline"
             data-qa="channel-section-collapse"
             aria-hidden="true"
-          />
+          /> */}
+          <CaretIcon collapsed={channelCollapse} />
         </CollapseButton>
         <span>Direct Messages</span>
       </h2>
