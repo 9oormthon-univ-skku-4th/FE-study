@@ -46,12 +46,10 @@ const Workspace: VFC = () => {
     fetcher,
   );
 
-  const { data: memberData } = useSWR<IChannel[]>(
-    userData ? `/api/workspaces/${workspace}/members` : null,
-    fetcher,
-  );
-  
-
+  // const { data: memberData } = useSWR<IChannel[]>(
+  //   userData ? `/api/workspaces/${workspace}/members` : null,
+  //   fetcher,
+  // );
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
@@ -125,23 +123,24 @@ const Workspace: VFC = () => {
   return (
     <div>
       <Header>
-        <RightMenu>
-          <span onClick={onClickUserProfile}>
-            <ProfileImg src={gravatar.url(userData.nickname, { s: '28px', d: 'retro' })} alt={userData.nickname} />
-            {showUserMenu && <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onCloseUserProfile}>
-              <ProfileModal>
-                <img src={gravatar.url(userData.nickname, { s: '36px', d: 'retro' })} alt={userData.nickname} />
-                <div>
-                  <span id="profile-name">{userData.nickname}</span>
-                  <span id="profile-active">Active</span>
-                </div>
-              </ProfileModal>
-              <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
-            </Menu>}
-          </span>
-        </RightMenu>
+        {userData && (
+          <RightMenu>
+            <span onClick={onClickUserProfile}>
+              <ProfileImg src={gravatar.url(userData.nickname, { s: '28px', d: 'retro' })} alt={userData.nickname} />
+            </span>
+            {showUserMenu && (
+              <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onCloseUserProfile}>
+                <ProfileModal>
+                  <img src={gravatar.url(userData.nickname, { s: '36px', d: 'retro' })} alt={userData.nickname} />
+                  <div>
+                    <span id="profile-name">{userData.nickname}</span>
+                    <span id="profile-active">Active</span>
+                  </div>
+                </ProfileModal>
+                <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
+              </Menu>)}
+          </RightMenu>)}
       </Header>
-      <button onClick={onLogout}>로그아웃</button>
       <WorkspaceWrapper>
         <Workspaces>{userData?.Workspaces.map((ws) => {
           return (

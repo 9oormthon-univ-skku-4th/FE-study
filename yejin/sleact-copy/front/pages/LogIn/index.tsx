@@ -1,5 +1,5 @@
 import useInput from '@hooks/useInput';
-import { Success, Form, Error, Label, Input, LinkContainer, Button, Header} from '@pages/SignUp/styles';
+import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 import useSWR from 'swr';
 
 const LogIn = () => {
-  const {data, error, mutate} = useSWR('/api/users', fetcher); // 로그인 페이지 들어오면 처음에 실행됨, data는 false
+  const { data: userData, error, mutate } = useSWR('/api/users', fetcher); // 로그인 페이지 들어오면 처음에 실행됨, data는 false
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -23,8 +23,8 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then((response) => {
-          mutate(response.data, false); 
+        .then(() => {
+          mutate();
           // data, error가 바뀌는 순간 컴포넌트는 리렌더링됨 
         })
         .catch((error) => {
@@ -32,22 +32,23 @@ const LogIn = () => {
           setLogInError(error.response?.status === 401);
         });
     },
-    [email, password],
+    [email, password, mutate],
   );
 
+  console.log(error, userData);
+  if (!error && userData) {
+    console.log('로그인됨', userData);
+    return <Redirect to="/workspace/sleact/channel/일반" />;
+  }
+
   // 로딩 중 
-  if (data === undefined){
+  if (userData === undefined) {
     return <div>로딩 중...</div>
   }
 
-  if(data){ // 로그인 성공 후에 채널로 가게 됨, data에 내 정보 들어있음  
-    return <Redirect to="/workspace/sleact/channel/일반"/>
+  if (userData) { // 로그인 성공 후에 채널로 가게 됨, data에 내 정보 들어있음  
+    return <Redirect to="/workspace/sleact/channel/일반" />
   }
-  // console.log(error, userData);
-  // if (!error && userData) {
-  //   console.log('로그인됨', userData);
-  //   return <Redirect to="/workspace/sleact/channel/일반" />;
-  // }
 
   return (
     <div id="container">
