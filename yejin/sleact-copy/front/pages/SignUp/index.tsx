@@ -7,7 +7,7 @@ import useSWR from "swr";
 import fetcher from "@utils/fetcher";
 
 const SignUp = () => {
-  const {data, error, mutate} = useSWR('http://localhost:3095/api/users', fetcher); // 내 정보 가져오기 
+  const {data, error, mutate} = useSWR('/api/users', fetcher); // 내 정보 가져오기 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
 
@@ -37,7 +37,7 @@ const SignUp = () => {
       console.log('서버로 회원가입하기')
       setSignUpError('');
       setSignUpSuccess(false);
-      axios.post('http://localhost:3095/api/users', { // 포트 번호 유의 (3090이 3095'로' 보내는 것)
+      axios.post('/api/users', { // 포트 번호 유의 (3090이 3095'로' 보내는 것)
         email,
         nickname,
         password,

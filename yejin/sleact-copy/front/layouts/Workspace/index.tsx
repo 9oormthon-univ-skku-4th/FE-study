@@ -33,17 +33,26 @@ const Workspace: VFC = () => {
 
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData, error, mutate } = useSWR<IUser | false>(
-    'http://localhost:3095/api/users',
+    '/api/users',
     fetcher,
     { dedupingInterval: 2000, }
   );
   // 서버로부터 채널 데이터 받아오기 (현재 내 워크스페이스에 있는 채널들 모두 가져옴) 
   // 로그인하지 않은 상태(userData가 null이면 -> null가져옴)
-  const { data: channelData } = useSWR<IChannel[]>(userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null, fetcher);
+  const { data: channelData } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/channels` : null,
+    fetcher,
+  );
+
+  const { data: memberData } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
+    fetcher,
+  );
+  
 
 
   const onLogout = useCallback(() => {
-    axios.post('http://localhost:3095/api/users/logout', null, {
+    axios.post('/api/users/logout', null, {
       withCredentials: true,
     })
       .then(() => {
@@ -69,7 +78,7 @@ const Workspace: VFC = () => {
     if (!newWorkspace || !newWorkspace.trim()) return;
     if (!newUrl || !newUrl.trim()) return;
     if (!newWorkspace || !newWorkspace.trim()) return;
-    axios.post('http://localhost:3095/api/workspaces', {
+    axios.post('/api/workspaces', {
       workspace: newWorkspace,
       url: newUrl,
     }, {
