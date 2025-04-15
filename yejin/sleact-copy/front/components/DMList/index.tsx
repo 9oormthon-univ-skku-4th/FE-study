@@ -9,6 +9,7 @@ import { useParams } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 import { CaretIcon } from '@layouts/Workspace/styles';
+import useSocket from '@hooks/useSocket';
 
 const DMList = () => {
   const { workspace } = useParams<{ workspace?: string }>(); // 라우터 파라미터 
@@ -19,7 +20,7 @@ const DMList = () => {
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher,
   );
-  // const [socket] = useSocket(workspace);
+  const [socket] = useSocket(workspace);
   const [channelCollapse, setChannelCollapse] = useState(false); // CollapseButton에 대한 상태 
   const [onlineList, setOnlineList] = useState<number[]>([]);
 
@@ -32,16 +33,16 @@ const DMList = () => {
     setOnlineList([]);
   }, [workspace]);
 
-  // useEffect(() => {
-  //   socket?.on('onlineList', (data: number[]) => {
-  //     setOnlineList(data);
-  //   });
-  //   console.log('socket on dm', socket?.hasListeners('dm'), socket);
-  //   return () => {
-  //     console.log('socket off dm', socket?.hasListeners('dm'));
-  //     socket?.off('onlineList');
-  //   };
-  // }, [socket]);
+  useEffect(() => {
+    socket?.on('onlineList', (data: number[]) => {
+      setOnlineList(data);
+    });
+    console.log('socket on dm', socket?.hasListeners('dm'), socket);
+    return () => {
+      console.log('socket off dm', socket?.hasListeners('dm'));
+      socket?.off('onlineList');
+    };
+  }, [socket]);
 
   return (
     <>

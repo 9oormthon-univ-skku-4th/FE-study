@@ -37,12 +37,6 @@ const Workspace: VFC = () => {
   // const [socket, disconnectSocket] = useSocket(workspace);
   const [socket, disconnect] = useSocket(workspace);
 
-  useEffect(() => {
-    // socket.on('message');
-    // socket.emit();
-    // disconnect();
-  }, [])
-
   const { data: userData, error, mutate } = useSWR<IUser | false>(
     '/api/users',
     fetcher,
@@ -54,11 +48,19 @@ const Workspace: VFC = () => {
     userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher,
   );
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      console.info('로그인하자', socket);
+      socket?.emit('login', { id: userData?.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [socket, userData, channelData]);
 
-  // const { data: memberData } = useSWR<IChannel[]>(
-  //   userData ? `/api/workspaces/${workspace}/members` : null,
-  //   fetcher,
-  // );
+  useEffect(() => {
+    return () => {
+      console.info('disconnect socket', workspace);
+      disconnect();
+    };
+  }, [ workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
@@ -123,19 +125,6 @@ const Workspace: VFC = () => {
   const onClickInviteWorkspace = useCallback(() => {
     setShowInviteWorkspaceModal(true);
   }, []);
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.info('disconnect socket', workspace);
-  //     disconnectSocket();
-  //   };
-  // }, [disconnectSocket, workspace]);
-  // useEffect(() => {
-  //   if (channelData && userData) {
-  //     console.info('로그인하자', socket);
-  //     socket?.emit('login', { id: userData?.id, channels: channelData.map((v) => v.id) });
-  //   }
-  // }, [socket, userData, channelData]);
 
   if (!userData) {
     return <Redirect to="/login" />

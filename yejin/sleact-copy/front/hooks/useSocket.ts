@@ -33,7 +33,7 @@ import io from 'socket.io-client';
 
 const sockets: { [key: string]: SocketIOClient.Socket } = {};
 const backUrl = 'http://localhost:3095';
-const useSocket = (workspace?: string) => {
+const useSocket = (workspace?: string): [SocketIOClient.Socket | undefined, () => void] => {
   const disconnect = useCallback(() => {
     if (workspace) {
       sockets[workspace].disconnect();
@@ -45,7 +45,12 @@ const useSocket = (workspace?: string) => {
     return [undefined, disconnect];
   }
 
-  sockets[workspace] = io.connect(`${backUrl}/ws-${workspace}`);
+  if (!sockets[workspace]) { // 없을 때만 만들기 
+    sockets[workspace] = io.connect(`${backUrl}/ws-${workspace}`, {
+      transports: ['websocket'] // polling하지 말고 웹소켓 써라 
+    });
+  }
+
 
 
 
