@@ -1,10 +1,18 @@
-import React from "react";
+import React, { VFC } from "react";
 import { ChatZone } from "./styles";
+import { IDM } from "@typings/db";
+import Chat from "@components/Chat";
 
-const ChatList = () => {
+interface Props {
+  chatData?: IDM[];
+}
+
+const ChatList: VFC<Props> = ({ chatData }) => {
   return (
     <ChatZone>
-      <section>section</section>
+      {chatData?.map((chat) => (
+        <Chat key={chat.id} data={chat} />
+      ))}
     </ChatZone>
   );
 };
