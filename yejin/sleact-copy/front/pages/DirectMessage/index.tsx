@@ -7,17 +7,34 @@ import fetcher from "@utils/fetcher";
 import ChatBox from "@components/ChatBox";
 import ChatList from "@components/ChatList";
 import useInput from "@hooks/useInput";
+import axios from "axios";
+import { IDM } from "@typings/db";
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher); // 상대방 데이터
   const { data: myData } = useSWR('/api/users', fetcher);
-  const [chat, onChangeChat] = useInput('');
+  const [chat, onChangeChat, setChat] = useInput('');
+
+  const { data: chatData, mutate: mutateChat } = useSWR<IDM[]>( // 채팅 받아오기 
+    `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`,
+    fetcher,
+  );
 
   // hooks는 return보다 올려서 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
     console.log('submit');
+    if (chat?.trim()) {
+      axios
+        .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+          content: chat,
+        })
+        .then(() => {
+          setChat(''); // 채팅창에 있던 글자 지우기 
+        })
+        .catch(console.error);
+    }
   }, []);
 
   // 로딩 중 or error 일 때 화면 띄우지 않기 

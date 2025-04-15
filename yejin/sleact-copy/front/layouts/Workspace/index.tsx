@@ -1,6 +1,6 @@
 import fetcher from "@utils/fetcher";
 import axios from "axios";
-import React, { FC, useCallback, useState, VFC } from "react";
+import React, { FC, useCallback, useEffect, useState, VFC } from "react";
 import { Redirect, Route, Switch, useParams } from "react-router";
 import useSWR from "swr";
 import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceModal, WorkspaceName, Workspaces, WorkspaceWrapper } from "./styles";
@@ -19,6 +19,7 @@ import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import InviteChannelModal from "@components/InviteChannelModal";
 import DMList from "@components/DMList";
 import ChannelList from "@components/ChannelList";
+import useSocket from "@hooks/useSocket";
 
 const Channel = loadable(() => import("@pages/Channel"));
 const DirectMessage = loadable(() => import("@pages/DirectMessage"));
@@ -32,8 +33,8 @@ const Workspace: VFC = () => {
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
-
   const { workspace } = useParams<{ workspace: string }>();
+  const [socket, disconnectSocket] = useSocket(workspace);
   const { data: userData, error, mutate } = useSWR<IUser | false>(
     '/api/users',
     fetcher,
@@ -58,7 +59,7 @@ const Workspace: VFC = () => {
       .then(() => {
         mutate(false, false);
       })
-  }, []);
+  }, [mutate]);
 
   const onCloseUserProfile = useCallback((e) => {
     e.stopPropagation();
@@ -115,6 +116,18 @@ const Workspace: VFC = () => {
     setShowInviteWorkspaceModal(true);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      console.info('disconnect socket', workspace);
+      disconnectSocket();
+    };
+  }, [disconnectSocket, workspace]);
+  useEffect(() => {
+    if (channelData && userData) {
+      console.info('로그인하자', socket);
+      socket?.emit('login', { id: userData?.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [socket, userData, channelData]);
 
   if (!userData) {
     return <Redirect to="/login" />
