@@ -34,7 +34,15 @@ const Workspace: VFC = () => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   const { workspace } = useParams<{ workspace: string }>();
-  const [socket, disconnectSocket] = useSocket(workspace);
+  // const [socket, disconnectSocket] = useSocket(workspace);
+  const [socket, disconnect] = useSocket(workspace);
+
+  useEffect(() => {
+    // socket.on('message');
+    // socket.emit();
+    // disconnect();
+  }, [])
+
   const { data: userData, error, mutate } = useSWR<IUser | false>(
     '/api/users',
     fetcher,
@@ -116,18 +124,18 @@ const Workspace: VFC = () => {
     setShowInviteWorkspaceModal(true);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      console.info('disconnect socket', workspace);
-      disconnectSocket();
-    };
-  }, [disconnectSocket, workspace]);
-  useEffect(() => {
-    if (channelData && userData) {
-      console.info('로그인하자', socket);
-      socket?.emit('login', { id: userData?.id, channels: channelData.map((v) => v.id) });
-    }
-  }, [socket, userData, channelData]);
+  // useEffect(() => {
+  //   return () => {
+  //     console.info('disconnect socket', workspace);
+  //     disconnectSocket();
+  //   };
+  // }, [disconnectSocket, workspace]);
+  // useEffect(() => {
+  //   if (channelData && userData) {
+  //     console.info('로그인하자', socket);
+  //     socket?.emit('login', { id: userData?.id, channels: channelData.map((v) => v.id) });
+  //   }
+  // }, [socket, userData, channelData]);
 
   if (!userData) {
     return <Redirect to="/login" />
