@@ -23,10 +23,9 @@ import gravatar from 'gravatar';
 import loadable from '@loadable/component';
 import Menu from '@components/Menu';
 import { IUser } from '@typings/db';
-import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from '@hooks/useInput';
-import Modal from '@components/Modal';
 import CreateChannelModal from '@components/CreateChannelModal';
+import CreateWorkspceModal from '@components/CreateWorkspaceModal';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -36,8 +35,6 @@ const Workspace: VFC = () => {
   const [ShowCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
   const [ShowWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [ShowCreateChannelModal, setShowCreateChannelModal] = useState(false);
-  const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
-  const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
   const { data: userData, error, mutate } = useSWR<IUser>('http://localhost:3095/api/users', fetcher);
 
@@ -47,6 +44,12 @@ const Workspace: VFC = () => {
     });
   }, []);
 
+  const onCloseModal = useCallback(() => {
+    setShowCreateWorkspaceModal(false);
+    setShowCreateChannelModal(false);
+    // 왜 onClickCreateWorkspace을 안쓰는거지? >> 다른 모달도 한번에 닫기 위해
+  }, []);
+
   const onClickUserProfile = useCallback(() => {
     //   setShowUserMenu(!showUserMenu)
     setShowUserMenu((prev) => !prev);
@@ -54,44 +57,6 @@ const Workspace: VFC = () => {
 
   const onClickCreateWorkspace = useCallback(() => {
     setShowCreateWorkspaceModal((prev) => !prev);
-  }, []);
-
-  const onCreateWorkspace = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (!newWorkspace || !newWorkspace.trim()) {
-        return;
-      }
-      if (!newUrl || !newUrl.trim()) {
-        return; // trim은 space만 입력 방지
-      }
-
-      axios
-        .post(
-          'http://localhost:3095/api/workspaces',
-          {
-            workspace: newWorkspace,
-            url: newUrl,
-          },
-          { withCredentials: true },
-        )
-        .then(() => {
-          mutate();
-          setShowCreateWorkspaceModal(false);
-          setNewWorkspace('');
-          setNewUrl('');
-        })
-        .catch((error) => {
-          console.dir(error);
-        });
-    },
-    [newWorkspace, newUrl],
-  );
-
-  const onCloseModal = useCallback(() => {
-    setShowCreateWorkspaceModal(false);
-    setShowCreateChannelModal(false);
-    // 왜 onClickCreateWorkspace을 안쓰는거지? >> 다른 모달도 한번에 닫기 위해
   }, []);
 
   const toggleWorkspaceModal = useCallback(() => {
@@ -160,19 +125,11 @@ const Workspace: VFC = () => {
           </Switch>
         </Chats>
       </WorkspaceWrapper>
-      <Modal show={ShowCreateWorkspaceModal} onCloseModal={onCloseModal}>
-        <form onSubmit={onCreateWorkspace}>
-          <Label id="workspace-label">
-            <span>워크스페이스 이름</span>
-            <Input id="workspace" value={newWorkspace} onChange={onChangeNewWorkspace} />
-          </Label>
-          <Label id="workspace-url-label">
-            <span>워크스페이스 URL</span>
-            <Input id="workspace-url" value={newUrl} onChange={onChangeNewUrl} />
-          </Label>
-          <Button type="submit">생성하기</Button>
-        </form>
-      </Modal>
+      <CreateWorkspceModal
+        show={ShowCreateWorkspaceModal}
+        onCloseModal={onCloseModal}
+        setShowCreateWorkspaceModal={setShowCreateWorkspaceModal}
+      />
       <CreateChannelModal
         show={ShowCreateChannelModal}
         onCloseModal={onCloseModal}
