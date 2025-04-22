@@ -17,12 +17,12 @@ import {
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { FC, useCallback, useState, VFC } from 'react';
-import { Link, Redirect, Route, Switch } from 'react-router-dom';
+import { Link, Redirect, Route, Switch, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
 import loadable from '@loadable/component';
 import Menu from '@components/Menu';
-import { IUser } from '@typings/db';
+import { IChannel, IUser } from '@typings/db';
 import useInput from '@hooks/useInput';
 import CreateChannelModal from '@components/CreateChannelModal';
 import CreateWorkspceModal from '@components/CreateWorkspaceModal';
@@ -31,12 +31,18 @@ const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 const Workspace: VFC = () => {
+  const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [ShowCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
   const [ShowWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [ShowCreateChannelModal, setShowCreateChannelModal] = useState(false);
 
   const { data: userData, error, mutate } = useSWR<IUser>('http://localhost:3095/api/users', fetcher);
+
+  const { data: channelData } = useSWR<IChannel[]>(
+    userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null,
+    fetcher,
+  );
 
   const onLogout = useCallback(() => {
     axios.post('http://localhost:3095/api/users/logout', null, { withCredentials: true }).then(() => {
@@ -100,7 +106,7 @@ const Workspace: VFC = () => {
         <Workspaces>
           {userData?.Workspaces.map((ws) => {
             return (
-              <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
+              <Link key={ws.id} to={`/workspace/${ws.url}/channel/일반`}>
                 <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
               </Link>
             );
@@ -116,6 +122,7 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
+            {channelData?.map((v)=>(<div key={v.id}>{v.name}</div>))}
           </MenuScroll>
         </Channels>
         <Chats>
@@ -133,6 +140,7 @@ const Workspace: VFC = () => {
       <CreateChannelModal
         show={ShowCreateChannelModal}
         onCloseModal={onCloseModal}
+        setShowCreateChannelModal={setShowCreateChannelModal}
       />
     </div>
   );
