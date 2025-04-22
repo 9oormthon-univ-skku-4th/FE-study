@@ -28,6 +28,8 @@ import CreateChannelModal from '@components/CreateChannelModal';
 import CreateWorkspceModal from '@components/CreateWorkspaceModal';
 import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
+import ChannelList from '@components/ChannelList';
+import DMList from '@components/DMList';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -46,6 +48,11 @@ const Workspace: VFC = () => {
 
   const { data: channelData } = useSWR<IChannel[]>(
     userData ? `/api/workspaces/${workspace}/channels` : null,
+    fetcher,
+  );
+
+  const { data: memberData } = useSWR<IUser[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher,
   );
 
@@ -82,6 +89,7 @@ const Workspace: VFC = () => {
   const onClickInviteWorkspace = useCallback(()=>{
     setShowInviteWorkspaceModal(true);
   },[])
+
 
   if (userData === undefined) {
     return <div>로딩중...</div>;
@@ -134,7 +142,8 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((v)=>(<div key={v.id}>{v.name}</div>))}
+            <ChannelList/>
+            <DMList/>
           </MenuScroll>
         </Channels>
         <Chats>
@@ -159,11 +168,11 @@ const Workspace: VFC = () => {
         onCloseModal={onCloseModal}
         setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
       />
-      <InviteChannelModal
+      {/* <InviteChannelModal
         show={showInviteChannelModal}
         onCloseModal={onCloseModal}
         setShowInviteChannelModal={setShowInviteChannelModal}
-      />
+      /> */}
     </div>
   );
 };
