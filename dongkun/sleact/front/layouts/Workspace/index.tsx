@@ -16,7 +16,7 @@ import {
 } from '@layouts/Workspace/styles';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState, VFC } from 'react';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
@@ -26,13 +26,16 @@ import { IUser } from '@typings/db';
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from '@hooks/useInput';
 import Modal from '@components/Modal';
+import CreateChannelModal from '@components/CreateChannelModal';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
-const Workspace: FC = ({ children }) => {
+const Workspace: VFC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [ShowCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
+  const [ShowWorkspaceModal, setShowWorkspaceModal] = useState(false);
+  const [ShowCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
@@ -60,9 +63,9 @@ const Workspace: FC = ({ children }) => {
         return;
       }
       if (!newUrl || !newUrl.trim()) {
-        return;   // trim은 space만 입력 방지
-      } 
-      
+        return; // trim은 space만 입력 방지
+      }
+
       axios
         .post(
           'http://localhost:3095/api/workspaces',
@@ -87,7 +90,16 @@ const Workspace: FC = ({ children }) => {
 
   const onCloseModal = useCallback(() => {
     setShowCreateWorkspaceModal(false);
-    // 왜 onClickCreateWorkspace을 안쓰는거지?
+    setShowCreateChannelModal(false);
+    // 왜 onClickCreateWorkspace을 안쓰는거지? >> 다른 모달도 한번에 닫기 위해
+  }, []);
+
+  const toggleWorkspaceModal = useCallback(() => {
+    setShowWorkspaceModal((prev) => !prev);
+  }, []);
+
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal(true);
   }, []);
 
   if (userData === undefined) {
@@ -131,8 +143,15 @@ const Workspace: FC = ({ children }) => {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName>Sleact</WorkspaceName>
-          <MenuScroll>Menu Scroll</MenuScroll>
+          <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
+          <MenuScroll>
+            <Menu show={ShowWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80 }}>
+              <WorkspaceModal>
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onLogout}>로그아웃</button>
+              </WorkspaceModal>
+            </Menu>
+          </MenuScroll>
         </Channels>
         <Chats>
           <Switch>
@@ -154,6 +173,10 @@ const Workspace: FC = ({ children }) => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
+      <CreateChannelModal
+        show={ShowCreateChannelModal}
+        onCloseModal={onCloseModal}
+      />
     </div>
   );
 };
