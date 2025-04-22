@@ -17,7 +17,7 @@ const CreateWorkspceModal: VFC<Props> = ({ show, onCloseModal, setShowCreateWork
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
-  const { data: userData, error, mutate } = useSWR<IUser>('http://localhost:3095/api/users', fetcher);
+  const { data: userData, error, mutate } = useSWR<IUser>('/api/users', fetcher);
 
   const onCreateWorkspace = useCallback(
     (e) => {
@@ -31,7 +31,7 @@ const CreateWorkspceModal: VFC<Props> = ({ show, onCloseModal, setShowCreateWork
 
       axios
         .post(
-          'http://localhost:3095/api/workspaces',
+          '/api/workspaces',
           {
             workspace: newWorkspace,
             url: newUrl,

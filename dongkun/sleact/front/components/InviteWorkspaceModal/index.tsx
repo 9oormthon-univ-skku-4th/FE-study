@@ -18,14 +18,14 @@ const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteWor
   const [newMember, onChangeNewMember, setNewMember] = useInput  ('');
   const {workspace, channel} = useParams<{workspace: string; channel: string}>();
 
-  const { data: userData, error, mutate } = useSWR<IUser>('http://localhost:3095/api/users', fetcher);
+  const { data: userData, error, mutate } = useSWR<IUser>('/api/users', fetcher);
 
 //   const { data: channelData, mutate: mutateChannel } = useSWR<IChannel[]>(
-//     userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null,
+//     userData ? `/api/workspaces/${workspace}/channels` : null,
 //     fetcher,
 //   );
   const { data: memberData, mutate: mutateMember } = useSWR<IUser[]>(
-    userData ? `http://localhost:3095/api/workspaces/${workspace}/members` : null,
+    userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher,
   );
 
@@ -34,7 +34,7 @@ const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteWor
     if(!newMember || !newMember.trim()) return;
     
 
-    axios.post(`http://localhost:3095/api/workspaces/${workspace}/members`, {
+    axios.post(`/api/workspaces/${workspace}/members`, {
       email: newMember
     }, {
       withCredentials: true

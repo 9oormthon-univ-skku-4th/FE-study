@@ -42,15 +42,15 @@ const Workspace: VFC = () => {
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
 
 
-  const { data: userData, error, mutate } = useSWR<IUser>('http://localhost:3095/api/users', fetcher);
+  const { data: userData, error, mutate } = useSWR<IUser>('/api/users', fetcher);
 
   const { data: channelData } = useSWR<IChannel[]>(
-    userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null,
+    userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher,
   );
 
   const onLogout = useCallback(() => {
-    axios.post('http://localhost:3095/api/users/logout', null, { withCredentials: true }).then(() => {
+    axios.post('/api/users/logout', null, { withCredentials: true }).then(() => {
       mutate();
     });
   }, []);
