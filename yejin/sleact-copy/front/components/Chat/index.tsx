@@ -17,7 +17,7 @@ const Chat: VFC<Props> = ({ data }) => {
 
   // @[제로초](7)
   // \d 숫자      +는 1개 이상 ?는 0개나 1가 *은 0개 이상    g는 모두 찾기 
-  const result = regexifyString({
+  const result = useMemo(()=>regexifyString({
     input: data.content,
     pattern: /@\[(.+?)]\((\d+?)\)|\n/g,
     decorator(match, index) {
@@ -32,7 +32,7 @@ const Chat: VFC<Props> = ({ data }) => {
       }
       return <br key={index} />; // 줄바꿈 
     },
-  });
+  }), [data.content]);
 
   return (
     <ChatWrapper>
@@ -50,4 +50,4 @@ const Chat: VFC<Props> = ({ data }) => {
   );
 };
 
-export default Chat;
+export default memo(Chat);
