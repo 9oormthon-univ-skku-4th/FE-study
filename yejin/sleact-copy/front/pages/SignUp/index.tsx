@@ -7,7 +7,7 @@ import useSWR from "swr";
 import fetcher from "@utils/fetcher";
 
 const SignUp = () => {
-  const {data, error, mutate} = useSWR('http://localhost:3095/api/users', fetcher); // 내 정보 가져오기 
+  const {data, error, mutate} = useSWR('/api/users', fetcher); // 내 정보 가져오기 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
 
@@ -37,7 +37,7 @@ const SignUp = () => {
       console.log('서버로 회원가입하기')
       setSignUpError('');
       setSignUpSuccess(false);
-      axios.post('http://localhost:3095/api/users', { // 포트 번호 유의 (3090이 3095'로' 보내는 것)
+      axios.post('/api/users', { // 포트 번호 유의 (3090이 3095'로' 보내는 것)
         email,
         nickname,
         password,
@@ -63,7 +63,7 @@ const SignUp = () => {
     // 위치 아무데나 둘 수 있는 거 아님!!
     // 항상 여기 있어야 함 (return은 항상 hooks보다 아래 있어야 함)
     if(data){
-      return <Redirect to="/workspace/channel"/>
+      return <Redirect to="/workspace/sleact/channel/일반"/>
     }
 
   return (

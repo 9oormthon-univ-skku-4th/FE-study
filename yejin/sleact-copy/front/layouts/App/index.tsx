@@ -14,7 +14,7 @@ const App = () => {
       <Redirect exact path="/" to="/login" />
       <Route path="/login" component={LogIn} />
       <Route path="/signup" component={SignUp} />
-      <Route path="/workspace" component={Workspace} />
+      <Route path="/workspace/:workspace" component={Workspace} />
     </Switch>
   );
   // Swith -  여러 개 라우터 중 하나 화면에 표시 
