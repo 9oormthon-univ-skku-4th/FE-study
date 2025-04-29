@@ -41,6 +41,7 @@ const EachDM: VFC<Props> = ({ member, isOnline }) => {
       />
       <span className={count && count > 0 ? 'bold' : undefined}>{member.nickname}</span>
       {member.id === userData?.id && <span> (나)</span>}
+      {isOnline && <span>📶</span>}
       {(count && count > 0 && <span className="count">{count}</span>) || null}
     </NavLink>
   );
