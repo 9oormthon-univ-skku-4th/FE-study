@@ -30,7 +30,7 @@ const EachDM: VFC<Props> = ({ member, isOnline }) => {
   return (
     <NavLink key={member.id} activeClassName="selected" to={`/workspace/${workspace}/dm/${member.id}`}>
       <i
-        className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${
+        className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence c-presence--resetIA ${
           isOnline ? 'c-presence--active c-icon--presence-online' : 'c-icon--presence-offline'
         }`}
         aria-hidden="true"
@@ -41,7 +41,6 @@ const EachDM: VFC<Props> = ({ member, isOnline }) => {
       />
       <span className={count && count > 0 ? 'bold' : undefined}>{member.nickname}</span>
       {member.id === userData?.id && <span> (나)</span>}
-      {isOnline && <span>📶</span>}
       {(count && count > 0 && <span className="count">{count}</span>) || null}
     </NavLink>
   );
