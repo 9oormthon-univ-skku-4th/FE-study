@@ -48,6 +48,10 @@ const Workspace: VFC = () => {
     userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher,
   );
+  const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null,
+    fetcher,);
+  // const [soket, disconnect] = useSocket(workspace);
+
   useEffect(() => {
     if (channelData && userData && socket) {
       console.info('로그인하자', socket);
@@ -60,7 +64,7 @@ const Workspace: VFC = () => {
       console.info('disconnect socket', workspace);
       disconnect();
     };
-  }, [ workspace, disconnect]);
+  }, [workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
@@ -136,7 +140,7 @@ const Workspace: VFC = () => {
         {userData && (
           <RightMenu>
             <span onClick={onClickUserProfile}>
-              <ProfileImg src={gravatar.url(userData.nickname, { s: '28px', d: 'retro' })} alt={userData.nickname} />
+              <ProfileImg src={gravatar.url(userData.email, { s: '28px', d: 'retro' })} alt={userData.nickname} />
             </span>
             {showUserMenu && (
               <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onCloseUserProfile}>
