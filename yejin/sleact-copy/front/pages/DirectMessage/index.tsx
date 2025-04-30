@@ -93,7 +93,7 @@ const DirectMessage = () => {
           return chatData;
         }, false).then(() => {
           if (scrollbarRef.current) { // 스크롤바 조정 
-            if ( 
+            if (
               scrollbarRef.current.getScrollHeight() <
               scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
             ) {
@@ -124,11 +124,12 @@ const DirectMessage = () => {
   }, [socket, onMessage]);
 
 
-  // 로딩 시 스크롤바 제일 아래로 
+  // 로딩 시 스크롤바 제일 아래로
   useEffect(() => {
     if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-
+      setTimeout(() => {
+        scrollbarRef.current?.scrollToBottom();
+      }, 100);
     }
   }, [chatData]);
 
@@ -149,8 +150,7 @@ const DirectMessage = () => {
         chatSections={chatSections}
         ref={scrollbarRef}
         setSize={setSize}
-        isReachingEnd={isReachingEnd}
-        isEmpty={isEmpty} />
+        isReachingEnd={isReachingEnd} />
       <ChatBox
         onSubmitForm={onSubmitForm}
         chat={chat}
