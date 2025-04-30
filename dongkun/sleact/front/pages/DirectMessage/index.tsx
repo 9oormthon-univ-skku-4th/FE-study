@@ -9,6 +9,7 @@ import ChatBox from '@components/ChatBox';
 import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
 import axios from 'axios';
+import makeSection from '@utils/makeSection';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
@@ -45,12 +46,15 @@ const DirectMessage = () => {
     return null;
   }
 
+  const chatSections = makeSection(chatData ? [...chatData].reverse() : []);
+  // chatData.reverse()는 mutable
+
   return (
     <Container>
       <Header>
         <img src={gravatar.url(userData.email, { size: '28px', d: 'retro' })} alt={userData.nickname} />
       </Header>
-      <ChatList chatData={chatData} />
+      <ChatList chatSections={chatSections} />
       <ChatBox chat={chat} onSumbmitForm={onSubmitForm} onChangeChat={onChangeChat} />
     </Container>
   );
