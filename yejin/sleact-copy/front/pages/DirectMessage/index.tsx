@@ -12,6 +12,8 @@ import axios from "axios";
 import { IDM } from "@typings/db";
 import makeSection from "@utils/makeSection";
 import Scrollbars from "react-custom-scrollbars-2";
+import useSocket from "@hooks/useSocket";
+import { toast } from "react-toastify";
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
@@ -23,6 +25,8 @@ const DirectMessage = () => {
     (index: number) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
     fetcher,
   );
+
+  const [socket] = useSocket(workspace);
 
   const isEmpty = chatData?.[0]?.length === 0;
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1]?.length < 20) || false;
@@ -80,6 +84,45 @@ const DirectMessage = () => {
     },
     [chat, workspace, id, myData, userData, chatData, mutateChat, setChat], // 위에서 사용한 데이터 모두 넣어줌 
   );
+
+  const onMessage = useCallback(
+    (data: IDM) => {
+      if (data.SenderId === Number(id) && myData.id !== Number(id)) { // 내 채팅이 아닌 경우에만 mutate
+        mutateChat((chatData) => { // 가장 최신 데이터 넣어줌 
+          chatData?.[0].unshift(data);
+          return chatData;
+        }, false).then(() => {
+          if (scrollbarRef.current) { // 스크롤바 조정 
+            if ( 
+              scrollbarRef.current.getScrollHeight() <
+              scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
+            ) {
+              console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+              setTimeout(() => {
+                scrollbarRef.current?.scrollToBottom();
+              }, 100);
+            } else {
+              toast.success('새 메시지가 도착했습니다.', {
+                onClick() {
+                  scrollbarRef.current?.scrollToBottom();
+                },
+                closeOnClick: true,
+              });
+            }
+          }
+        });
+      }
+    },
+    [id, myData, mutateChat],
+  );
+
+  useEffect(() => {
+    socket?.on('dm', onMessage);
+    return () => {
+      socket?.off('dm', onMessage);
+    }
+  }, [socket, onMessage]);
+
 
   // 로딩 시 스크롤바 제일 아래로 
   useEffect(() => {
