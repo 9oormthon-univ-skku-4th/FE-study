@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, VFC } from 'react';
+import React, { memo, useCallback, useRef, VFC } from 'react';
 import { ChatZone, Section } from '@components/ChatList/styles';
 import { IDM } from '@typings/db';
 import Chat from '@components/Chat';
@@ -23,4 +23,4 @@ const ChatList: VFC<Props> = ({ chatData }) => {
   );
 };
 
-export default ChatList;
+export default memo(ChatList);
