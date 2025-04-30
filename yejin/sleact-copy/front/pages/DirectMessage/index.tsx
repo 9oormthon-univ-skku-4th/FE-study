@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Container, Header } from "./styles";
 import gravatar from 'gravatar'
 import useSWR from "swr";
@@ -29,54 +29,65 @@ const DirectMessage = () => {
   const scrollbarRef = useRef<Scrollbars>(null); // 스크롤바 컨트롤 
 
   // hooks는 return보다 올려서 
-  const onSubmitForm = useCallback((e) => {
-    e.preventDefault();
-    console.log('submit');
-    if (chat?.trim()) {
-      axios
-        .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
-          content: chat,
-        })
-        .then(() => {
-          setChat(''); // 채팅창에 있던 글자 지우기 
-        })
-        .catch(console.error);
-    }
-  }, [chat, workspace, id]);
 
-  // const onSubmitForm = useCallback(
-  //   (e) => {
-  //     e.preventDefault();
-  //     if (chat?.trim() && chatData) {
-  //       const savedChat = chat;
-  //       mutateChat((prevChatData) => {
-  //         prevChatData?.[0].unshift({
-  //           id: (chatData[0][0]?.id || 0) + 1,
-  //           content: savedChat,
-  //           SenderId: myData.id,
-  //           Sender: myData,
-  //           ReceiverId: userData.id,
-  //           Receiver: userData,
-  //           createdAt: new Date(),
-  //         });
-  //         return prevChatData;
-  //       }, false).then(() => {
-  //         localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
-  //         setChat('');
-  //         if (scrollbarRef.current) {
-  //           console.log('scrollToBottom!', scrollbarRef.current?.getValues());
-  //           scrollbarRef.current.scrollToBottom();
-  //         }
-  //       });
-  //       axios
-  //         .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
-  //           content: chat,
-  //         })
-  //         .catch(console.error);
-  //     }
-  //   },
-  //   [chat, workspace, id, myData, userData, chatData, mutateChat, setChat],
-  // );
+  // const onSubmitForm = useCallback((e) => {
+  //   e.preventDefault();
+  //   console.log('submit');
+  //   if (chat?.trim()) {
+  //     axios
+  //       .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+  //         content: chat,
+  //       })
+  //       .then(() => {
+  //         mutateChat();
+  //         setChat(''); // 채팅창에 있던 글자 지우기 
+  //         scrollbarRef.current?.scrollToBottom;
+  //       })
+  //       .catch(console.error);
+  //   }
+  // }, [chat, workspace, id, setChat]);
+
+  const onSubmitForm = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (chat?.trim() && chatData) {
+        const savedChat = chat;
+        mutateChat((prevChatData) => {
+          prevChatData?.[0].unshift({
+            id: (chatData[0][0]?.id || 0) + 1,
+            content: savedChat,
+            SenderId: myData.id,
+            Sender: myData,
+            ReceiverId: userData.id,
+            Receiver: userData,
+            createdAt: new Date(),
+          });
+          return prevChatData;
+        }, false).then(() => {
+          localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
+          setChat('');
+          if (scrollbarRef.current) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            scrollbarRef.current.scrollToBottom();
+          }
+        });
+        axios
+          .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+            content: chat,
+          })
+          .catch(console.error);
+      }
+    },
+    [chat, workspace, id, myData, userData, chatData, mutateChat, setChat], // 위에서 사용한 데이터 모두 넣어줌 
+  );
+
+  // 로딩 시 스크롤바 제일 아래로 
+  useEffect(() => {
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+
+    }
+  }, [chatData]);
 
   // 로딩 중 or error 일 때 화면 띄우지 않기 
   if (!userData || !myData) {
