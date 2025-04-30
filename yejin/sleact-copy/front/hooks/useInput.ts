@@ -1,12 +1,11 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useState, ChangeEvent } from 'react';
 
-type ReturnTypes<T = any> = [T, (e: any) => void, Dispatch<SetStateAction<T>>];
+type ReturnTypes<T> = [T, (e: ChangeEvent<HTMLInputElement>) => void, Dispatch<SetStateAction<T>>];
 
-// 매개변수 타입 선언 필요, 보통 제너릭 사용
-const useInput = <T = any>(initialData: T): ReturnTypes  => {
+const useInput = <T>(initialData: T): ReturnTypes<T> => {
   const [value, setValue] = useState(initialData);
-  const handler = useCallback((e: any) => {
-    setValue(e.target.value);
+  const handler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setValue((e.target.value as unknown) as T); // 타입을 강제로 바꿔줌 
   }, []);
   return [value, handler, setValue];
 };
